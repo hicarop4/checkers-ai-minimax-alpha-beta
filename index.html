@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Jogo de Dama</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="aplicacao">
+      <div id="area-tabuleiro">
+        <div id="envoltorio-tabuleiro">
+          <div id="rotulos-colunas">
+            <span>A</span><span>B</span><span>C</span><span>D</span>
+            <span>E</span><span>F</span><span>G</span><span>H</span>
+          </div>
+          <div id="linha-tabuleiro">
+            <div id="rotulos-linhas">
+              <span>8</span><span>7</span><span>6</span><span>5</span>
+              <span>4</span><span>3</span><span>2</span><span>1</span>
+            </div>
+            <div id="tabuleiro" aria-label="Tabuleiro de Dama"></div>
+          </div>
+        </div>
+      </div>
+
+      <aside id="painel">
+        <header id="cabecalho-painel">
+          <h1>Jogo de Dama</h1>
+          <p class="subtitulo">Minimax · Monte Carlo · IA vs IA</p>
+        </header>
+
+        <div id="painel-adversario">
+          <label class="selecao-adversario">
+            <span>Adversário</span>
+            <select id="modo-adversario">
+              <option value="manual">Manual (2 jogadores)</option>
+              <option value="minimax">Minimax (α-β)</option>
+              <option value="montecarlo">Monte Carlo</option>
+              <option value="minimax-vs-montecarlo">
+                Minimax vs Monte Carlo
+              </option>
+            </select>
+          </label>
+        </div>
+
+        <div id="painel-jogadores">
+          <div class="selecao-adversario">
+            <span>Turno</span>
+          </div>
+          <div class="linha-jogador" id="jogador-preto">
+            <div class="ponto-jogador preto"></div>
+            <div class="info-jogador">
+              <span class="cor-jogador">Preto</span>
+              <span class="papel-jogador" id="papel-preto">—</span>
+            </div>
+          </div>
+          <div class="linha-jogador" id="jogador-branco">
+            <div class="ponto-jogador branco"></div>
+            <div class="info-jogador">
+              <span class="cor-jogador">Branco</span>
+              <span class="papel-jogador" id="papel-branco">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="barra-placar">
+          <div class="lado-placar">
+            <div class="peca-placar preto"></div>
+            <span id="contador-preto">12</span>
+          </div>
+          <div class="divisor-placar">vs</div>
+          <div class="lado-placar">
+            <div class="peca-placar branco"></div>
+            <span id="contador-branco">12</span>
+          </div>
+        </div>
+
+        <button id="reiniciar">Reiniciar partida</button>
+
+        <div id="secao-dica">
+          <button id="botao-dica" type="button" disabled>
+            Pedir dica da IA ✨
+          </button>
+          <p id="status-dica" class="status-dica"></p>
+          <div id="saida-dica" aria-live="polite"></div>
+        </div>
+
+        <div id="regras">
+          <h3>Regras</h3>
+          <ul>
+            <li>Arraste as peças para jogar</li>
+            <li>Capturas são obrigatórias</li>
+            <li>Coroe ao chegar na base adversária</li>
+            <li>Partida encerra após 120 lances (vence quem tiver mais material)</li>
+          </ul>
+        </div>
+
+        <div id="secao-historico">
+          <h3>Histórico</h3>
+          <div id="historico"></div>
+        </div>
+      </aside>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
