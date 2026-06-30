@@ -29,6 +29,16 @@ const modoAdversarioEl = document.getElementById("modo-adversario");
 const botaoDica = document.getElementById("botao-dica");
 const statusDicaEl = document.getElementById("status-dica");
 const saidaDicaEl = document.getElementById("saida-dica");
+const modoLoopEl = document.getElementById("modo-loop");
+const placarLoopEl = document.getElementById("placar-loop");
+const loopPartidasEl = document.getElementById("loop-partidas");
+const loopMinimaxVEl = document.getElementById("loop-minimax-v");
+const loopMinimaxDEl = document.getElementById("loop-minimax-d");
+const loopMontecarloVEl = document.getElementById("loop-montecarlo-v");
+const loopMontecarloDEl = document.getElementById("loop-montecarlo-d");
+const loopEmpatesEl = document.getElementById("loop-empates");
+
+const ATRASO_PROXIMA_PARTIDA = 1200;
 
 let estado = { tabuleiro: [], vez: BRANCO, selecionada: null };
 let modoAdversario = "manual";
@@ -41,6 +51,14 @@ let resumoPedido = false;
 let dicaCarregando = false;
 let minimaxEhPreto = true; // sorteado a cada nova partida no modo IA vs IA
 let partidaAtual = 0; // incrementado em novoJogo() para cancelar fluxos da partida anterior
+let loopAtivo = false; // quando ligado, as IAs jogam em loop e o placar é contabilizado
+let resultadoContabilizado = false; // evita contar a mesma partida duas vezes
+const placarLoop = {
+  minimax: { vitorias: 0, derrotas: 0 },
+  montecarlo: { vitorias: 0, derrotas: 0 },
+  empates: 0,
+  partidas: 0,
+};
 
 function clonarTabuleiro(tabuleiro) {
   return tabuleiro.map((linha) =>
@@ -69,6 +87,7 @@ function novoJogo() {
   dicaUsadaNoTurno = false;
   resumoPedido = false;
   dicaCarregando = false;
+  resultadoContabilizado = false;
   if (saidaDicaEl) saidaDicaEl.textContent = "";
   if (statusDicaEl) statusDicaEl.textContent = "";
   desenhar();
@@ -856,6 +875,7 @@ function verificarFimDeJogo() {
     const desfecho = vencedor ? `${nomeCor(vencedor)} vence por material` : "empate por material";
     anunciar(`Limite de ${MAX_LANCES} lances - ${desfecho}.`);
     atualizarBotaoDica();
+    registrarResultadoLoop();
     return true;
   }
 
@@ -866,9 +886,61 @@ function verificarFimDeJogo() {
     vencedor = adversario(adv);
     anunciar(`${nomeCor(vencedor)} venceu - fim de jogo.`);
     atualizarBotaoDica();
+    registrarResultadoLoop();
     return true;
   }
   return false;
+}
+
+// qual algoritmo controla cada cor na partida IA vs IA atual
+function algoritmoDaCor(cor) {
+  return (cor === PRETO) === minimaxEhPreto ? "minimax" : "montecarlo";
+}
+
+// contabiliza o desfecho no placar do loop e agenda a próxima partida
+function registrarResultadoLoop() {
+  if (!loopAtivo || !modoIAvsIA() || resultadoContabilizado) return;
+  resultadoContabilizado = true;
+
+  placarLoop.partidas++;
+  if (!vencedor) {
+    placarLoop.empates++;
+  } else {
+    const vencedorAlg = algoritmoDaCor(vencedor);
+    const perdedorAlg = vencedorAlg === "minimax" ? "montecarlo" : "minimax";
+    placarLoop[vencedorAlg].vitorias++;
+    placarLoop[perdedorAlg].derrotas++;
+  }
+  atualizarPlacarLoop();
+
+  const geracao = partidaAtual;
+  setTimeout(() => {
+    if (geracao !== partidaAtual) return; // já reiniciaram manualmente
+    if (!loopAtivo || !modoIAvsIA()) return; // loop desligado nesse meio tempo
+    novoJogo();
+  }, ATRASO_PROXIMA_PARTIDA);
+}
+
+// mostra/atualiza o placar (só visível com o loop ligado)
+function atualizarPlacarLoop() {
+  if (!placarLoopEl) return;
+  placarLoopEl.hidden = !loopAtivo;
+  if (loopPartidasEl) loopPartidasEl.textContent = placarLoop.partidas;
+  if (loopMinimaxVEl) loopMinimaxVEl.textContent = placarLoop.minimax.vitorias;
+  if (loopMinimaxDEl) loopMinimaxDEl.textContent = placarLoop.minimax.derrotas;
+  if (loopMontecarloVEl) loopMontecarloVEl.textContent = placarLoop.montecarlo.vitorias;
+  if (loopMontecarloDEl) loopMontecarloDEl.textContent = placarLoop.montecarlo.derrotas;
+  if (loopEmpatesEl) loopEmpatesEl.textContent = placarLoop.empates;
+}
+
+function zerarPlacarLoop() {
+  placarLoop.minimax.vitorias = 0;
+  placarLoop.minimax.derrotas = 0;
+  placarLoop.montecarlo.vitorias = 0;
+  placarLoop.montecarlo.derrotas = 0;
+  placarLoop.empates = 0;
+  placarLoop.partidas = 0;
+  atualizarPlacarLoop();
 }
 
 function terminarTurno() {
@@ -991,8 +1063,30 @@ if (botaoDica) botaoDica.addEventListener("click", aoClicarDica);
 
 modoAdversarioEl.addEventListener("change", () => {
   modoAdversario = modoAdversarioEl.value;
+  // o loop só faz sentido em IA vs IA; se sair desse modo, desliga
+  if (loopAtivo && !modoIAvsIA()) {
+    loopAtivo = false;
+    if (modoLoopEl) modoLoopEl.checked = false;
+    atualizarPlacarLoop();
+  }
   novoJogo();
   historicoEl.innerHTML = "";
 });
+
+if (modoLoopEl)
+  modoLoopEl.addEventListener("change", () => {
+    loopAtivo = modoLoopEl.checked;
+    if (loopAtivo) {
+      // garante o modo IA vs IA, único em que os agentes jogam entre si
+      if (!modoIAvsIA()) {
+        modoAdversario = "minimax-vs-montecarlo";
+        modoAdversarioEl.value = "minimax-vs-montecarlo";
+      }
+      zerarPlacarLoop();
+    }
+    atualizarPlacarLoop();
+    novoJogo();
+    historicoEl.innerHTML = "";
+  });
 
 novoJogo();

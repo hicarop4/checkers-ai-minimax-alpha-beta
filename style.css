@@ -198,10 +198,73 @@ body {
 
 #painel-adversario,
 #painel-jogadores,
-#barra-placar {
+#barra-placar,
+#placar-loop {
   border: 1px solid #ccc;
   padding: 8px 10px;
   background: #fff;
+}
+
+#painel-adversario {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.opcao-loop {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--texto);
+  cursor: pointer;
+}
+.opcao-loop input {
+  cursor: pointer;
+}
+
+#placar-loop h3 {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--texto-suave);
+  margin-bottom: 6px;
+}
+
+.contador-partidas {
+  font-size: 12px;
+  color: var(--texto-suave);
+  margin-bottom: 6px;
+}
+
+.linha-placar-loop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 13px;
+}
+
+.nome-agente {
+  color: var(--texto);
+}
+
+.resultado-agente {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 13px;
+  color: var(--texto-suave);
+  white-space: nowrap;
+}
+.resultado-agente strong {
+  color: var(--texto);
+}
+
+.empates-loop {
+  font-size: 12px;
+  color: var(--texto-suave);
+  margin-top: 6px;
+  border-top: 1px solid #eee;
+  padding-top: 6px;
 }
 
 #painel-jogadores {

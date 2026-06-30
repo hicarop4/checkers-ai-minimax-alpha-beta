@@ -42,6 +42,32 @@
               </option>
             </select>
           </label>
+          <label class="opcao-loop">
+            <input type="checkbox" id="modo-loop" />
+            <span>Loop (IA vs IA contínuo)</span>
+          </label>
+        </div>
+
+        <div id="placar-loop" hidden>
+          <h3>Placar do loop</h3>
+          <p class="contador-partidas">
+            Partidas: <span id="loop-partidas">0</span>
+          </p>
+          <div class="linha-placar-loop">
+            <span class="nome-agente">Minimax (α-β)</span>
+            <span class="resultado-agente">
+              <strong id="loop-minimax-v">0</strong>V /
+              <strong id="loop-minimax-d">0</strong>D
+            </span>
+          </div>
+          <div class="linha-placar-loop">
+            <span class="nome-agente">Monte Carlo</span>
+            <span class="resultado-agente">
+              <strong id="loop-montecarlo-v">0</strong>V /
+              <strong id="loop-montecarlo-d">0</strong>D
+            </span>
+          </div>
+          <p class="empates-loop">Empates: <span id="loop-empates">0</span></p>
         </div>
 
         <div id="painel-jogadores">
